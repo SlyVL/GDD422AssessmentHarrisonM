@@ -52,33 +52,31 @@ public class PlayerController : MonoBehaviour
         }
         else if (xInput > 0)  // Moving right
         {
-            // Reset the sprite's flipX to false
+            //CHATGPT FIX
             GetComponent<SpriteRenderer>().flipX = false;
         }
 
-        // Restricting the player's position within the defined borders
+        // Restricting the player's movement within the defined borders
         Vector2 clampedPosition = new Vector2(
             Mathf.Clamp(rb.position.x, xMin, xMax),
             Mathf.Clamp(rb.position.y, yMin, yMax)
         );
 
-        // Updating the Rigidbody2D position (this prevents direct manipulation of position)
+        // Updating the Rigidbody2D position, this allows my sprite to flip and update without any clipping through walls
         rb.position = clampedPosition;
     }
 
 
-
+    //CHATGPT FIX
     private void Animation()
     {
-        // Calculate the movement magnitude (speed) and pass it to the animator as a float
+        // calculated the speed and passes it as a float 
         float speedMagnitude = new Vector2(rb.velocity.x, rb.velocity.y).magnitude;
 
-        // Set the "Speed" parameter in the animator to the magnitude of the movement
+        
         animator.SetFloat("Speed", speedMagnitude);
 
-        // If you want to use a boolean instead of float:
-        // bool isMoving = speedMagnitude > 0f;
-        // animator.SetBool("isMoving", isMoving);
+        
     }
 
 }
