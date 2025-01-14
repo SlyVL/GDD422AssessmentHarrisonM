@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 { //Creating borders on the map so the player cannot move outside it
-    float xMin = -13;
-    float xMax = 13f;
-    float yMin = -4f;
-    float yMax = 4f;
+    float xMin = -130;
+    float xMax = 130f;
+    float yMin = -400f;
+    float yMax = 400f;
     //the player movement speed which can be changed on the inspector 
     [SerializeField] float speed = 10f;
    
