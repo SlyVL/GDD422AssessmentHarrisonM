@@ -122,23 +122,12 @@ public class PlayerController : MonoBehaviour
         canDash = false;
         isDashing = true;
 
-        // Capture player input directly for the dash direction
-        float xInput = Input.GetAxisRaw("Horizontal");
-        float yInput = Input.GetAxisRaw("Vertical");
-        Vector2 dashDirection = new Vector2(xInput, yInput).normalized;
+        // Set IsDashing to true to trigger the dash animation
+        animator.SetBool("IsDashing", true);
 
-        // Default to the last movement direction if no input is detected
-        if (dashDirection == Vector2.zero)
-        {
-            dashDirection = rb.velocity.normalized;
-            if (dashDirection == Vector2.zero) // If still zero, default to right
-            {
-                dashDirection = Vector2.right;
-            }
-        }
-
-        // Apply dash velocity
-        rb.velocity = dashDirection * dashingPower;
+        // Double the player's speed
+        float originalSpeed = speed;
+        speed *= 2;
 
         // Enable trail effect
         tr.emitting = true;
@@ -146,19 +135,25 @@ public class PlayerController : MonoBehaviour
         // Wait for the dash duration
         yield return new WaitForSeconds(dashingTime);
 
-        // Stop dash movement by resetting velocity so there is no carried momentum
-        rb.velocity = Vector2.zero;
+        // Reset the speed to its original value
+        speed = originalSpeed;
 
-        // Disable trail renderer
+        // Disable trail effect
         tr.emitting = false;
 
         // End dash state
         isDashing = false;
 
-        // Wait for cooldown before allowing dashing again
+        // Sets the animation to false to then stop the animation
+        animator.SetBool("IsDashing", false);
+
+        // Wait for cooldown before allowing you to dash again
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
     }
+
+
+
 
 
 
