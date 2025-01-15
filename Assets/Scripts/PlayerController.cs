@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,16 +11,18 @@ public class PlayerController : MonoBehaviour
     float yMin = -400f;
     float yMax = 400f;
 
+    //player health 
+    [SerializeField] float health = 1f;
+
     // the player movement speed which can be changed on the inspector 
     [SerializeField] float speed = 10f;
+
     //This is to reference the trail renderer
     [SerializeField] private TrailRenderer tr;
-
 
     //All variables for the dash ability
     private bool canDash = true;
     private bool isDashing;
-    private float dashingPower = 600f;
     private float dashingTime = 0.5f;
     private float dashingCooldown = 0f;
 
@@ -42,8 +43,6 @@ public class PlayerController : MonoBehaviour
         Animation();
 
         Dashing();
-
-        
     }
 
     private void FixedUpdate()
@@ -53,6 +52,30 @@ public class PlayerController : MonoBehaviour
             return;
         }
     }
+
+    // Use OnTriggerEnter2D for 2D colliders
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            // Call the function to handle the player's death
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        // Log for debugging
+        Debug.Log("Player died. Reloading the scene immediately.");
+
+        // Disable the player object (so it doesn't interfere with the scene reload)
+        gameObject.SetActive(false);
+
+        // Immediately reload the scene after the player dies
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);  // Reload the current scene
+    }
+
+
 
     private void Moving()
     {
@@ -69,12 +92,10 @@ public class PlayerController : MonoBehaviour
         // Flip the sprite horizontally based on the direction of movement
         if (xInput < 0)  // Moving left
         {
-            // Flip the sprite by setting flipX to true
             GetComponent<SpriteRenderer>().flipX = true;
         }
         else if (xInput > 0)  // Moving right
         {
-            //CHATGPT FIX
             GetComponent<SpriteRenderer>().flipX = false;
         }
 
@@ -84,38 +105,29 @@ public class PlayerController : MonoBehaviour
             Mathf.Clamp(rb.position.y, yMin, yMax)
         );
 
-        // Updating the Rigidbody2D position, this allows my sprite to flip and update without any clipping through walls
+        // Updating the Rigidbody2D position
         rb.position = clampedPosition;
     }
-    //setting the keybind for the dash function
+
     private void Dashing()
     {
-       if(isDashing)
+        if (isDashing)
         {
             return;
         }
-        
-        
+
         if (Input.GetKeyDown(KeyCode.Space) && canDash)
         {
             StartCoroutine(Dash());
         }
     }
 
-    
-
-    //CHATGPT FIX
     private void Animation()
     {
-        // calculated the speed and passes it as a float 
+        // Calculate the speed and pass it as a float to the animator
         float speedMagnitude = new Vector2(rb.velocity.x, rb.velocity.y).magnitude;
-
-        
         animator.SetFloat("Speed", speedMagnitude);
-
-        
     }
-
 
     private IEnumerator Dash()
     {
@@ -125,7 +137,7 @@ public class PlayerController : MonoBehaviour
         // Set IsDashing to true to trigger the dash animation
         animator.SetBool("IsDashing", true);
 
-        // Double the player's speed
+        // Double the player's speed during the dash
         float originalSpeed = speed;
         speed *= 2;
 
@@ -144,18 +156,11 @@ public class PlayerController : MonoBehaviour
         // End dash state
         isDashing = false;
 
-        // Sets the animation to false to then stop the animation
+        // Stop the dash animation
         animator.SetBool("IsDashing", false);
 
         // Wait for cooldown before allowing you to dash again
         yield return new WaitForSeconds(dashingCooldown);
         canDash = true;
     }
-
-
-
-
-
-
-
 }
