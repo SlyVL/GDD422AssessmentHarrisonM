@@ -14,6 +14,16 @@ public class PlayerController : MonoBehaviour
 
     // the player movement speed which can be changed on the inspector 
     [SerializeField] float speed = 10f;
+    //This is to reference the trail renderer
+    [SerializeField] private TrailRenderer tr;
+
+
+    //All variables for the dash ability
+    private bool canDash = true;
+    private bool isDashing;
+    private float dashingPower = 600f;
+    private float dashingTime = 0.5f;
+    private float dashingCooldown = 0f;
 
     // Reference to the player's Rigidbody2D component
     private Rigidbody2D rb;
@@ -30,6 +40,18 @@ public class PlayerController : MonoBehaviour
         Moving();
 
         Animation();
+
+        Dashing();
+
+        
+    }
+
+    private void FixedUpdate()
+    {
+        if (isDashing)
+        {
+            return;
+        }
     }
 
     private void Moving()
@@ -65,7 +87,22 @@ public class PlayerController : MonoBehaviour
         // Updating the Rigidbody2D position, this allows my sprite to flip and update without any clipping through walls
         rb.position = clampedPosition;
     }
+    //setting the keybind for the dash function
+    private void Dashing()
+    {
+       if(isDashing)
+        {
+            return;
+        }
+        
+        
+        if (Input.GetKeyDown(KeyCode.Space) && canDash)
+        {
+            StartCoroutine(Dash());
+        }
+    }
 
+    
 
     //CHATGPT FIX
     private void Animation()
@@ -78,5 +115,52 @@ public class PlayerController : MonoBehaviour
 
         
     }
+
+
+    private IEnumerator Dash()
+    {
+        canDash = false;
+        isDashing = true;
+
+        // Capture player input directly for the dash direction
+        float xInput = Input.GetAxisRaw("Horizontal");
+        float yInput = Input.GetAxisRaw("Vertical");
+        Vector2 dashDirection = new Vector2(xInput, yInput).normalized;
+
+        // Default to the last movement direction if no input is detected
+        if (dashDirection == Vector2.zero)
+        {
+            dashDirection = rb.velocity.normalized;
+            if (dashDirection == Vector2.zero) // If still zero, default to right
+            {
+                dashDirection = Vector2.right;
+            }
+        }
+
+        // Apply dash velocity
+        rb.velocity = dashDirection * dashingPower;
+
+        // Enable trail effect
+        tr.emitting = true;
+
+        // Wait for the dash duration
+        yield return new WaitForSeconds(dashingTime);
+
+        // Stop dash movement by resetting velocity so there is no carried momentum
+        rb.velocity = Vector2.zero;
+
+        // Disable trail renderer
+        tr.emitting = false;
+
+        // End dash state
+        isDashing = false;
+
+        // Wait for cooldown before allowing dashing again
+        yield return new WaitForSeconds(dashingCooldown);
+        canDash = true;
+    }
+
+
+
 
 }
