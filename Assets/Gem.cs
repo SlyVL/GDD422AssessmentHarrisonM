@@ -4,22 +4,21 @@ using UnityEngine;
 
 public class Gem : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private CoinPickup soundManager; // Reference to the CoinSoundManager
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Find the CoinSoundManager in the scene
+        soundManager = FindObjectOfType<CoinPickup>();
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
+            // Play the sound effect
+            soundManager.PlayCoinSound();
+
             // Call the function to collect the gem
             Collect();
         }
@@ -29,7 +28,5 @@ public class Gem : MonoBehaviour
     {
         // Disables the object when collected
         gameObject.SetActive(false);
-
-       
     }
 }
