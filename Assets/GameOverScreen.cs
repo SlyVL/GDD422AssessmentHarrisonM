@@ -23,15 +23,21 @@ public class GameOverScreen : MonoBehaviour
 
     private void Update()
     {
-        // Wait for a key press to hide the Game Over screen (example: pressing Enter)
-        if (Input.GetKeyDown(KeyCode.Return))  // You can change this to any key you prefer
+        // Wait for a key press to hide the Game Over screen
+        if (Input.GetKeyDown(KeyCode.Return))  
         {
-            gameObject.SetActive(false);  // Hide the Game Over screen when Enter is pressed
+            // Hides the Game Over screen when Enter is pressed
+            gameObject.SetActive(false);  
         }
     }
 
     public void RestartButton()
     {
         SceneManager.LoadScene("Game");
+    }
+
+    public void ExitButton()
+    {
+        SceneManager.LoadScene("Main Menu");
     }
 }
